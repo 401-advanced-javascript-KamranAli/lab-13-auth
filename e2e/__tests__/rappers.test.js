@@ -16,6 +16,25 @@ describe('Rappers Api', () => {
     yearsActive: 8
   };
 
+  function postRapper(rapper) {
+    return request
+      .post('/api/rappers')
+      .set('Authorization', user.token)
+      .send(rapper)
+      .expect(200)
+      .then(({ body }) => body);
+  }
+
+  function updateFavoriteRapper(rapper) {
+    return postRapper(rapper).then(rapper => {
+      return request
+        .put(`/api/me/favorites/${rapper._id}`)
+        .set('Authorization', user.token)
+        .expect(200)
+        .then(({ body }) => body);
+    });
+  }
+
   it('post a rapper for this user', () => {
     return request
       .post('/api/rappers')
@@ -44,6 +63,74 @@ describe('Rappers Api', () => {
   });
 
   it('updates a rapper', () => {
+    return postRapper(chance).then(rapper => {
+      return request
+        .put(`/api/rappers/${rapper._id}`)
+        .set('Authorization', user.token)
+        .send({ yearsActive: 9 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.yearsActive).toBe(9);
+          expect(body._id).toBe(rapper._id);
+        });
+    });
+  });
 
+  it('deletes a rapper', () => {
+    return updateFavoriteRapper(chance).then(oldRapper => {
+      const rapper = oldRapper[0];
+      return request
+        .delete(`/api/rappers/${rapper}`)
+        .set('Authorization', user.token)
+        .expect(200)
+        .then(() => {
+          return request
+            .get('/api/rappers')
+            .set('Authorization', user.token)
+            .expect(200);
+        })
+        .then(({ body }) => {
+          expect(body.length).toBe(0);
+        });
+    });
+  });
+
+  it('get all rappers by id', () => {
+    return postRapper(chance)
+      .then(() => {
+        return request
+          .get('/api/rappers')
+          .set('Authorization', user.token)
+          .expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBe(1);
+      });
+  });
+
+  it('get a rapper by id', () => {
+    return postRapper(chance)
+      .then(rapper => {
+        return request
+          .get(`/api/rappers/${rapper._id}`)
+          .set('Authorization', user.token)
+          .expect(200);
+      })
+      .then(({ body }) => {
+        expect(body).toMatchInlineSnapshot(
+          {
+            _id: expect.any(String)
+          },
+          `
+          Object {
+            "__v": 0,
+            "_id": Any<String>,
+            "name": "Chance the Rapper",
+            "owner": "5d97cf787f9fe06220856365",
+            "yearsActive": 8,
+          }
+        `
+        );
+      });
   });
 });
