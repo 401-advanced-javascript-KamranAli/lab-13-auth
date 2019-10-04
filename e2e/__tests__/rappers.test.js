@@ -25,16 +25,6 @@ describe('Rappers Api', () => {
       .then(({ body }) => body);
   }
 
-  function updateFavoriteRapper(rapper) {
-    return postRapper(rapper).then(rapper => {
-      return request
-        .put(`/api/me/favorites/${rapper._id}`)
-        .set('Authorization', user.token)
-        .expect(200)
-        .then(({ body }) => body);
-    });
-  }
-
   it('post a rapper for this user', () => {
     return request
       .post('/api/rappers')
@@ -77,10 +67,9 @@ describe('Rappers Api', () => {
   });
 
   it('deletes a rapper', () => {
-    return updateFavoriteRapper(chance).then(oldRapper => {
-      const rapper = oldRapper[0];
+    return postRapper(chance).then(rapper => {
       return request
-        .delete(`/api/rappers/${rapper}`)
+        .delete(`/api/rappers/${rapper._id}`)
         .set('Authorization', user.token)
         .expect(200)
         .then(() => {
@@ -90,6 +79,7 @@ describe('Rappers Api', () => {
             .expect(200);
         })
         .then(({ body }) => {
+          console.log(body);
           expect(body.length).toBe(0);
         });
     });
@@ -119,14 +109,15 @@ describe('Rappers Api', () => {
       .then(({ body }) => {
         expect(body).toMatchInlineSnapshot(
           {
-            _id: expect.any(String)
+            _id: expect.any(String),
+            owner: expect.any(String)
           },
           `
           Object {
             "__v": 0,
             "_id": Any<String>,
             "name": "Chance the Rapper",
-            "owner": "5d97cf787f9fe06220856365",
+            "owner": Any<String>,
             "yearsActive": 8,
           }
         `
