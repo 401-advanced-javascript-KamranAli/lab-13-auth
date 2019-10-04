@@ -3,7 +3,7 @@ const db = require('../db');
 const { signupUser } = require('../data-helpers');
 
 describe('me testing', () => {
-  beforeEach(() => db.dropCollection('user'));
+  beforeEach(() => db.dropCollection('users'));
   beforeEach(() => db.dropCollection('rappers'));
 
   let user = null;
@@ -28,7 +28,7 @@ describe('me testing', () => {
   function updateFavoriteRapper(rapper) {
     return postRapper(rapper).then(rapper => {
       return request
-        .put(`/api/me/favorites/${rapper.id}`)
+        .put(`/api/me/favorites/${rapper._id}`)
         .set('Authorization', user.token)
         .expect(200)
         .then(({ body }) => body);
@@ -44,20 +44,34 @@ describe('me testing', () => {
         .expect(200)
         .then(({ body }) => {
           expect(body[0]).toBe(rapper._id);
-
         });
     });
   });
 
   it('removes a rapper from favorites', () => {
-    return postRapper(rapper).then((rapper) => {
+    return updateFavoriteRapper(rapper).then(favorites => {
+      const favoredRapper = favorites[0];
       return request
-        .delete(`/api/me/favorites/${rapper._id}`)
+        .delete(`/api/me/favorites/${favoredRapper}`)
         .set('Authorization', user.token)
-        .expect(200);
-    })
-      .then(({ body }) => {
-        expect(body.length).toBe(0);
-      });
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.length).toBe(0);
+        });
+    });
+  });
+
+  it('get all user favorites', () => {
+    return postRapper(rapper).then(() => {
+      return request
+        .get('/api/me/favorites')
+        .set('Authorization', user.token)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.length).toBe(0);
+        });
+    });
+
+
   });
 });

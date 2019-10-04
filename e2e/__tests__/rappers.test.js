@@ -42,4 +42,8 @@ describe('Rappers Api', () => {
         );
       });
   });
+
+  it('updates a rapper', () => {
+
+  });
 });
