@@ -43,14 +43,21 @@ describe('me testing', () => {
         .send(rapper)
         .expect(200)
         .then(({ body }) => {
-          expect(body[0]).toMatchInlineSnapshot(
-            {
-              _id: expect.any(String)
-            },
+          expect(body[0]).toBe(rapper._id);
 
-
-          );
         });
     });
+  });
+
+  it('removes a rapper from favorites', () => {
+    return postRapper(rapper).then((rapper) => {
+      return request
+        .delete(`/api/me/favorites/${rapper._id}`)
+        .set('Authorization', user.token)
+        .expect(200);
+    })
+      .then(({ body }) => {
+        expect(body.length).toBe(0);
+      });
   });
 });
