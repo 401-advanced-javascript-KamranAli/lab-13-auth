@@ -9,7 +9,8 @@ describe('Auth API', () => {
 
   const testUser = {
     email: 'me@me.com',
-    password: 'abc'
+    password: 'abc',
+    role: 'admin'
   };
 
   let user = null;
