@@ -2,6 +2,8 @@ const request = require('../request');
 const { dropCollection } = require('../db');
 const jwt = require('jsonwebtoken');
 const { signupUser } = require('../data-helpers');
+require('dotenv').config();
+require('../../lib/models/user');
 
 describe('Auth API', () => {
 
@@ -73,7 +75,7 @@ describe('Auth API', () => {
     });
   }
 
-  testBadSignup('rejects bad password', { 
+  testBadSignup('rejects bad password', {
     email: testUser.email,
     password: 'bad password'
   });
@@ -95,6 +97,35 @@ describe('Auth API', () => {
       .get('/api/auth/verify')
       .set('Authorization', jwt.sign({ foo: 'bar' }, 'shhhhh'))
       .expect(401);
+  });
+
+  it('allows an admin to change user roles', () => {
+    return request
+      .post('/api/auth/signup')
+      .send({
+        email: 'email@email.com',
+        password: 'abc'
+      })
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body);
+        return (
+          request
+            .put(`/api/auth/user/${body._id}/roles/admin`)
+            .set('Authorization', user.token)
+            .expect(200)
+            .then(result => {
+              console.log(result.body);
+              expect(result.body).toMatchInlineSnapshot(
+                {
+                  _id: expect.any(String),
+                  hash: expect.any(String)
+                },
+
+              );
+            })
+        );
+      });
   });
 
 });

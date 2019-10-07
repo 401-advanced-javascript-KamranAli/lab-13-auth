@@ -11,25 +11,25 @@ describe('rappers api', () => {
     return signupUser().then(newUser => (user = newUser));
   });
 
-  const rocker = {
+  const rockstar = {
     name: 'post malone',
     country: 'US'
   };
 
-  function postRocker(rocker) {
-    return request
-      .post('/api/rockers')
-      .set('Authorization', user.token)
-      .send(rocker)
-      .expect(200)
-      .then(({ body }) => body);
-  }
+  // function postRockstar(rockstar) {
+  //   return request
+  //     .post('/api/rockstars')
+  //     .set('Authorization', user.token)
+  //     .send(rockstar)
+  //     .expect(200)
+  //     .then(({ body }) => body);
+  // }
 
   it('post a rocker for this user with admin role', () => {
     return request
       .post('/api/rockstars')
       .set('Authorization', user.token)
-      .send(rocker)
+      .send(rockstar)
       .expect(200)
       .then(({ body }) => {
         expect(body.roles).toBe(user._id);
@@ -39,7 +39,7 @@ describe('rappers api', () => {
             roles: expect.any(String)
           },
 
-          
+
         );
       });
   });
