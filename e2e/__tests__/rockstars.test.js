@@ -4,7 +4,7 @@ const { signupUser } = require('../data-helpers');
 
 describe('rappers api', () => {
   beforeEach(() => db.dropCollection('users'));
-  beforeEach(() => db.dropCollection('rockers'));
+  beforeEach(() => db.dropCollection('rockerstars'));
 
   let user = null;
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('rappers api', () => {
 
   it('post a rocker for this user with admin role', () => {
     return request
-      .post('/api/rockers')
+      .post('/api/rockstars')
       .set('Authorization', user.token)
       .send(rocker)
       .expect(200)

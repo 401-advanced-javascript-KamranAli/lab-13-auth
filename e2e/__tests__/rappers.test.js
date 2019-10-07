@@ -79,7 +79,6 @@ describe('Rappers Api', () => {
             .expect(200);
         })
         .then(({ body }) => {
-          console.log(body);
           expect(body.length).toBe(0);
         });
     });
